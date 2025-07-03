@@ -1,0 +1,48 @@
+<!-- save this as index.html or first.html and host it -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔄 Redirecting...</title>
+  <style>
+    body {
+      background: #f9fafb;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      flex-direction: column;
+      text-align: center;
+      color: #1f2937;
+    }
+    .loader {
+      margin-top: 18px;
+      border: 6px solid #e5e7eb;
+      border-top: 6px solid #3b82f6;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Redirecting you to the next page...</h2>
+  <p>Please wait a moment.</p>
+  <div class="loader"></div>
+
+<script>
+  setTimeout(() => {
+    window.location.href = "https://atharv-24git.github.io/code";
+  }, 3000); // only 3 second
+</script>
+
+</body>
+</html>
