@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Smart Nickname Generator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', 'Roboto', sans-serif;
+      background-color: #f2f4f8;
+      transition: background-color 0.6s ease-in-out;
+      overflow: hidden;
+    }
+
+    .container {
+      width: 92%;
+      max-width: 420px;
+      padding: 28px 24px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    h2 {
+      text-align: center;
+      color: #222;
+      font-size: 1.7rem;
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #333;
+      font-size: 0.94rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 15px;
+      background-color: #fefefe;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #007bff;
+      background-color: #fff;
+    }
+
+    button {
+      margin-top: 26px;
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      padding: 13px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .output {
+      margin-top: 0px;
+      font-size: 1.05em;
+      color: #222;
+      text-align: center;
+      line-height: 1.6;
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .output:hover {
+      transform: translateX(5px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .color-box {
+      width: 110px;
+      height: 52px;
+      margin: 15px auto 0;
+      border-radius: 10px;
+      border: 1px solid #000;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2),
+                  0 3px 8px rgba(0, 0, 0, 0.15);
+      transition: box-shadow 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>🔠 Smart Nickname</h2>
+
+  <label for="name">Name:</label>
+  <input type="text" id="name" placeholder="Enter your name" />
+
+  <label for="dob">DOB (Day only):</label>
+  <input type="number" id="dob" min="1" max="31" placeholder="e.g. 9" />
+
+  <label for="currDate">Current Date:</label>
+  <input type="date" id="currDate" />
+
+  <button onclick="generate()">Generate Nickname & Color</button>
+
+  <div class="output" id="output"></div>
+</div>
+
+<script>
+  // Auto-fill today's date
+  window.onload = () => {
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("currDate").value = today;
+  };
+
+  const grid = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const rows = 5;
+  const cols = Math.ceil(grid.length / rows);
+
+  function getLetterCoord(char) {
+    const upperChar = char.toUpperCase();
+    const index = grid.indexOf(upperChar);
+    if (index === -1) return { row: 0, col: 0, code: 0 };
+    const row = Math.floor(index / cols) + 1;
+    const col = (index % cols) + 1;
+    return { row, col, code: parseInt(`${row}${col}`) };
+  }
+
+  function reverseIfOver36(val) {
+    return val > 36 ? 72 - val : val;
+  }
+
+  function generate() {
+    const name = document.getElementById("name").value.trim();
+    const dob = parseInt(document.getElementById("dob").value);
+    const dateInput = document.getElementById("currDate").value;
+
+    if (!name || isNaN(dob) || dob < 1 || dob > 31 || !dateInput) {
+      alert("Please enter a valid name, DOB (1–31), and current date.");
+      return;
+    }
+
+    const currDate = new Date(dateInput);
+    if (isNaN(currDate.getTime())) {
+      alert("Invalid date format. Please select a proper date.");
+      return;
+    }
+
+    const first = name[0].toUpperCase();
+    const last = name[name.length - 1].toUpperCase();
+
+    const coord1 = getLetterCoord(first);
+    const coord2 = getLetterCoord(last);
+    const f1 = Math.abs(coord2.code - coord1.code);
+    const F1 = reverseIfOver36(f1);
+
+    const year = currDate.getFullYear();
+    const Ysum = year.toString().split('').reduce((sum, d) => sum + parseInt(d), 0);
+
+    const C = currDate.getDate();
+    const T = Ysum * C;
+    const d = dob;
+    const K = (C + F1) % 10;
+    const weekday = currDate.getDay();
+
+    const pickLeft = (weekday === 0 || weekday === 2 || weekday === 4 || weekday === 6); // Sun, Tue, Thu, Sat
+
+    function pickDigit(val) {
+      const str = val.toString().padStart(2, '0');
+      return pickLeft ? str[0] : str[1];
+    }
+
+    // 🕒 Time-aware digits (HH + MM)
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+
+    const digit1 = pickDigit((F1 + hour) % 100);
+    const digit2 = pickDigit((Ysum + minute) % 100);
+    const digit3 = pickDigit(C);
+    const digit4 = pickDigit(T % 100);
+    const digit5 = pickDigit(d);
+    const digit6 = pickDigit(K);
+
+    const code6 = `${digit1}${digit2}${digit3}${digit4}${digit5}${digit6}`;
+    const hexColor = `#${code6}`;
+
+    let L = F1 - d + T;
+    L = reverseIfOver36(L);
+    const finalGrid = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    const letter = finalGrid[(L - 1) % finalGrid.length];
+
+    const nickname = pickLeft ? `${letter} ${K}` : `${K} ${letter}`;
+
+    document.body.style.backgroundColor = hexColor;
+    document.getElementById("output").innerHTML = `
+      <strong>Nickname:</strong> ${nickname}<br>
+      <strong>6-digit Code:</strong> ${code6}<br>
+      <strong>Color:</strong> ${hexColor}<br>
+      <div class="color-box" style="background-color: ${hexColor};"></div>
+    `;
+  }
+</script>
+
+</body>
+</html>
