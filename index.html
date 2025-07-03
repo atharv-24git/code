@@ -164,8 +164,8 @@
     const dob = parseInt(document.getElementById("dob").value);
     const dateInput = document.getElementById("currDate").value;
 
-    if (!name || isNaN(dob) || dob < 1 || dob > 31 || !dateInput) {
-      alert("Please enter a valid name, DOB (1–31), and current date.");
+    if (!name || name.length < 2 || isNaN(dob) || dob < 1 || dob > 31 || !dateInput) {
+      alert("Please enter a valid name (at least 2 letters), DOB (1–31), and current date.");
       return;
     }
 
@@ -195,7 +195,7 @@
     const pickLeft = (weekday === 0 || weekday === 2 || weekday === 4 || weekday === 6); // Sun, Tue, Thu, Sat
 
     function pickDigit(val) {
-      const str = val.toString().padStart(2, '0');
+      const str = Math.abs(parseInt(val)).toString().padStart(2, '0');
       return pickLeft ? str[0] : str[1];
     }
 
@@ -216,9 +216,14 @@
 
     let L = F1 - d + T;
     L = reverseIfOver36(L);
-    const finalGrid = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    const letter = finalGrid[(L - 1) % finalGrid.length];
 
+    // ✅ FIX: Prevent L from being 0, negative or NaN
+    const finalGrid = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    if (L <= 0 || isNaN(L)) {
+      L = ((Math.abs(L) + 1) % finalGrid.length) + 1;
+    }
+
+    const letter = finalGrid[(L - 1) % finalGrid.length];
     const nickname = pickLeft ? `${letter} ${K}` : `${K} ${letter}`;
 
     document.body.style.backgroundColor = hexColor;
